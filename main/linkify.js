@@ -4,7 +4,7 @@ function linkify(text) {
     const imageRegex = /(https?:\/\/[^\s]+?\.(jpg|jpeg|png|gif|webp))/gi;
 
     text = text.replace(imageRegex, (url) => {
-        return `<img src="${url}" alt="Image" style="max-width: 100%; height: auto;">`;
+        return `<img src="${url}" alt="Image" style="max-width: 80%; height: auto;">`;
     });
 
 
