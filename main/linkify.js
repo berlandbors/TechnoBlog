@@ -1,14 +1,13 @@
 function linkify(text) {
     
-// Сначала обрабатываем ссылки на изображения
+    // Сначала обрабатываем ссылки на изображения
     const imageRegex = /(https?:\/\/[^\s]+?\.(jpg|jpeg|png|gif|webp))/gi;
 
     text = text.replace(imageRegex, (url) => {
-        return `<img src="${url}" alt="Image" style="max-width: 80%; height: auto;">`;
+        return `<img src="${url}" alt="Image" style="max-width: 100%; height: auto;">`;
     });
 
-
-// 1. Захватить URL до первого пробела или <, >, "
+    // 1. Захватить URL до первого пробела или <, >, "
     const urlRegex = /((https?:\/\/|www\.)[^\s<>"']+)/g;
 
     return text.replace(urlRegex, (url) => {
@@ -40,7 +39,7 @@ function linkify(text) {
         const items = match.split('\n').map(item =>
             item.replace(/^- (.+)$/, '<li>$1</li>')
         ).join('');
-        return `<ul>${items}</ul>`;
+        return `<ul>${items}</ul>';
     })
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
     .replace(/(^|[^*])\*(?!\s)(.+?)(?!\s)\*(?!\*)/g, '$1<em>$2</em>')
