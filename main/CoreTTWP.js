@@ -181,8 +181,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             const processedContent = linkify(post.content);
 
-            const shortContent = post.content.length > 333
-                ? post.content.substring(0, 333) + "..."
+            const shortContent = post.content.length > 555
+                ? post.content.substring(0, 555) + "..."
                 : post.content;
 
             const article = document.createElement("div");
