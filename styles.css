@@ -48,6 +48,39 @@ body.dark-theme hr {
     border-top-color: #444;
 }
 
+/* Приветственное сообщение */
+.welcome-message {
+    background-color: #f0f8ff;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border-left: 5px solid #3498db;
+}
+
+.welcome-message h3 {
+    color: #3498db;
+    margin-top: 0;
+}
+
+.welcome-message p {
+    font-size: 1.1em;
+    line-height: 1.6;
+}
+
+/* Темная тема для приветственного сообщения */
+body.dark-theme .welcome-message {
+    background-color: #1e3a5f;
+    border-left-color: #5dade2;
+}
+
+body.dark-theme .welcome-message h3 {
+    color: #5dade2;
+}
+
+body.dark-theme .welcome-message p {
+    color: #e0e0e0;
+}
+
 /* Кнопка переключения темы */
 .theme-toggle {
     position: fixed;
