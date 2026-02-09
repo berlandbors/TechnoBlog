@@ -253,11 +253,12 @@
             }
 
             // Подписываемся на изменения соединения
-            window.wifiDiagnostics.onChange((data) => {
+            window.wifiDiagnostics.onChange(() => {
                 if (isVisible) {
                     updateDiagnostics();
                     // Показываем уведомление об изменении
                     const notification = document.createElement('div');
+                    notification.className = 'wifi-notification';
                     notification.style.cssText = `
                         position: fixed;
                         top: 20px;

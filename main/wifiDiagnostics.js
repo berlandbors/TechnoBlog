@@ -62,28 +62,28 @@ class WiFiDiagnostics {
             return {
                 quality: 'excellent',
                 description: 'Отличное соединение',
-                color: '#00ff00',
+                color: '#27ae60',
                 icon: '✅'
             };
         } else if (effectiveType === '4g' || (effectiveType === '3g' && rtt < 200)) {
             return {
                 quality: 'good',
                 description: 'Хорошее соединение',
-                color: '#90ee90',
+                color: '#2ecc71',
                 icon: '✔️'
             };
         } else if (effectiveType === '3g' || effectiveType === '2g') {
             return {
                 quality: 'fair',
                 description: 'Удовлетворительное соединение',
-                color: '#ffa500',
+                color: '#f39c12',
                 icon: '⚠️'
             };
         } else {
             return {
                 quality: 'poor',
                 description: 'Слабое соединение',
-                color: '#ff0000',
+                color: '#e74c3c',
                 icon: '❌'
             };
         }
@@ -130,6 +130,8 @@ class WiFiDiagnostics {
     }
 
     // Запустить тест скорости (простой тест)
+    // Примечание: Использует небольшой файл для базовой проверки соединения.
+    // Для более точных измерений скорости следует использовать больший файл (1-5 МБ).
     async runSpeedTest(testUrl = 'https://www.google.com/favicon.ico') {
         try {
             const startTime = performance.now();
