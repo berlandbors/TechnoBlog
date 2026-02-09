@@ -337,6 +337,28 @@ input[type=range] {
     100% { transform: rotate(360deg); }
 }
 
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
 /* Адаптация под мобильные устройства */
 @media (max-width: 768px) {
     body {
@@ -401,5 +423,179 @@ input[type=range] {
     .search-container::after {
         font-size: 16px;
         right: 12px;
+    }
+}
+
+/* WiFi Diagnostics Panel Styles */
+.wifi-diagnostics-panel {
+    background-color: #f9f9f9;
+    border: 2px solid #3498db;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+body.dark-theme .wifi-diagnostics-panel {
+    background-color: #1e1e1e;
+    border-color: #3498db;
+}
+
+.wifi-diagnostics-panel h3 {
+    color: #3498db;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    font-size: 1.3rem;
+}
+
+body.dark-theme .wifi-diagnostics-panel h3 {
+    color: #5dade2;
+}
+
+.status-section {
+    margin-bottom: 20px;
+}
+
+.status-indicator {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #fff;
+    text-align: center;
+}
+
+body.dark-theme .status-indicator {
+    background-color: #2d2d2d;
+}
+
+.connection-info-section,
+.recommendations-section {
+    margin: 20px 0;
+}
+
+.diagnostics-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+}
+
+.diagnostics-table td {
+    padding: 8px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+body.dark-theme .diagnostics-table td {
+    border-bottom-color: #444;
+}
+
+.diagnostics-table td:first-child {
+    width: 50%;
+}
+
+.recommendations-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.recommendations-list li {
+    padding: 8px;
+    margin: 5px 0;
+    background-color: #fff;
+    border-left: 4px solid #3498db;
+    border-radius: 4px;
+}
+
+body.dark-theme .recommendations-list li {
+    background-color: #2d2d2d;
+}
+
+.timestamp {
+    font-size: 0.9rem;
+    color: #888;
+    text-align: right;
+    margin-top: 15px;
+}
+
+body.dark-theme .timestamp {
+    color: #aaa;
+}
+
+#wifiDiagnosticsToggle {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin: 20px 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+#wifiDiagnosticsToggle:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+}
+
+#wifiDiagnosticsToggle:active {
+    transform: translateY(0);
+}
+
+#speedTestButton {
+    background-color: #27ae60;
+    margin: 10px 0;
+}
+
+#speedTestButton:hover {
+    background-color: #229954;
+}
+
+#speedTestButton:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+.speed-test-result {
+    margin: 15px 0;
+    padding: 15px;
+    background-color: #e8f5e9;
+    border-radius: 5px;
+    border-left: 4px solid #27ae60;
+}
+
+body.dark-theme .speed-test-result {
+    background-color: #1b4d2a;
+}
+
+.speed-test-error {
+    background-color: #ffebee;
+    border-left-color: #e74c3c;
+}
+
+body.dark-theme .speed-test-error {
+    background-color: #4d1b1b;
+}
+
+@media (max-width: 768px) {
+    .wifi-diagnostics-panel {
+        padding: 15px;
+    }
+    
+    .wifi-diagnostics-panel h3 {
+        font-size: 1.1rem;
+    }
+    
+    .diagnostics-table td {
+        font-size: 0.9rem;
+    }
+    
+    #wifiDiagnosticsToggle {
+        width: 100%;
+        justify-content: center;
     }
 }
