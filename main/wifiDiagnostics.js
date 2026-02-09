@@ -67,7 +67,13 @@ class WiFiDiagnostics {
     }
 
     // Измерение скорости загрузки (простой тест)
-    async measureDownloadSpeed(testUrl = 'https://www.google.com/favicon.ico') {
+    // Можно передать собственный URL для тестирования
+    async measureDownloadSpeed(testUrl = null) {
+        // Если URL не указан, используем относительный путь к небольшому файлу на том же домене
+        if (!testUrl) {
+            // Пытаемся использовать небольшой локальный файл, если доступен
+            testUrl = window.location.origin + '/icons/PBAB.jpg';
+        }
         try {
             const startTime = performance.now();
             const response = await fetch(testUrl + '?t=' + Date.now(), {
@@ -99,7 +105,13 @@ class WiFiDiagnostics {
     }
 
     // Измерение задержки (ping-подобный тест)
-    async measureLatency(testUrl = 'https://www.google.com/favicon.ico', attempts = 3) {
+    // Можно передать собственный URL для тестирования
+    async measureLatency(testUrl = null, attempts = 3) {
+        // Если URL не указан, используем относительный путь к небольшому файлу на том же домене
+        if (!testUrl) {
+            // Пытаемся использовать небольшой локальный файл, если доступен
+            testUrl = window.location.origin + '/icons/PBAB.jpg';
+        }
         const results = [];
         
         for (let i = 0; i < attempts; i++) {
