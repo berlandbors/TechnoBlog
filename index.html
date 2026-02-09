@@ -132,6 +132,8 @@
 
     <!--script src="main/speech.js"></script-->
     <!--script src="main/openAudioStream.js"></script-->
+    <script src="main/wifiDiagnostics.js"></script>
+    <script src="main/wifiDiagnosticsUI.js"></script>
     <script src="main/linkify.js"></script>
     <script src="main/CoreTTWP.js"></script>
 
@@ -162,6 +164,41 @@
         } else {
             themeToggle.innerHTML = '🌜';
         }
+
+        // WiFi диагностика
+        const wifiDiagnosticsToggle = document.createElement('button');
+        wifiDiagnosticsToggle.className = 'wifi-diagnostics-toggle';
+        wifiDiagnosticsToggle.innerHTML = '🌐 Диагностика';
+        wifiDiagnosticsToggle.title = 'WiFi Диагностика';
+        wifiDiagnosticsToggle.style.bottom = '70px'; // Размещаем выше кнопки темы
+        
+        let diagnosticsUI = null;
+        wifiDiagnosticsToggle.addEventListener('click', () => {
+            if (!diagnosticsUI) {
+                const diagnostics = new WiFiDiagnostics();
+                diagnosticsUI = new WiFiDiagnosticsUI(diagnostics);
+                diagnosticsUI.show();
+                wifiDiagnosticsToggle.style.display = 'none';
+                
+                // Показываем кнопку обратно при закрытии панели
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'childList') {
+                            mutation.removedNodes.forEach((node) => {
+                                if (node.id === 'wifi-diagnostics-panel') {
+                                    wifiDiagnosticsToggle.style.display = 'block';
+                                    diagnosticsUI = null;
+                                    observer.disconnect();
+                                }
+                            });
+                        }
+                    });
+                });
+                observer.observe(document.body, { childList: true });
+            }
+        });
+        
+        document.body.appendChild(wifiDiagnosticsToggle);
         </script>
 
 <script data-goatcounter="https://berlandbor.goatcounter.com/count"
