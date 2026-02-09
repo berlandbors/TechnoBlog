@@ -104,6 +104,16 @@
 
 
 
+    <!-- WiFi Diagnostics Section -->
+    <div style="text-align: center; margin: 20px 0;">
+        <button id="wifiDiagnosticsToggle">
+            📡 Диагностика WiFi
+        </button>
+    </div>
+    <div id="wifiDiagnosticsContainer" style="display: none;">
+        <!-- WiFi diagnostics will be displayed here -->
+    </div>
+
     <!-- Поле поиска -->
     <!-- Красивое поле поиска -->
 <div class="search-container">
@@ -134,6 +144,7 @@
     <!--script src="main/openAudioStream.js"></script-->
     <script src="main/linkify.js"></script>
     <script src="main/CoreTTWP.js"></script>
+    <script src="main/wifiDiagnostics.js"></script>
 
    
 
@@ -158,6 +169,116 @@
         // Проверка сохраненной темы
         if (localStorage.getItem('darkTheme') === 'true') {
             document.body.classList.add('dark-theme');
+            themeToggle.innerHTML = '🌞';
+        } else {
+            themeToggle.innerHTML = '🌜';
+        }
+
+        // WiFi Diagnostics Toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const toggleButton = document.getElementById('wifiDiagnosticsToggle');
+            const container = document.getElementById('wifiDiagnosticsContainer');
+            let isVisible = false;
+
+            toggleButton.addEventListener('click', () => {
+                isVisible = !isVisible;
+                container.style.display = isVisible ? 'block' : 'none';
+                
+                if (isVisible) {
+                    // Обновляем диагностику при открытии
+                    updateDiagnostics();
+                    toggleButton.textContent = '📡 Скрыть диагностику';
+                } else {
+                    toggleButton.textContent = '📡 Диагностика WiFi';
+                }
+            });
+
+            function updateDiagnostics() {
+                const diagnosticsHTML = window.wifiDiagnostics.formatForDisplay();
+                container.innerHTML = diagnosticsHTML;
+                
+                // Добавляем кнопку теста скорости
+                const speedTestDiv = document.createElement('div');
+                speedTestDiv.style.textAlign = 'center';
+                speedTestDiv.style.marginTop = '15px';
+                
+                const speedTestButton = document.createElement('button');
+                speedTestButton.id = 'speedTestButton';
+                speedTestButton.textContent = '⚡ Запустить тест скорости';
+                speedTestButton.onclick = runSpeedTest;
+                
+                speedTestDiv.appendChild(speedTestButton);
+                container.querySelector('.wifi-diagnostics-panel').appendChild(speedTestDiv);
+                
+                // Добавляем место для результата теста
+                const speedTestResult = document.createElement('div');
+                speedTestResult.id = 'speedTestResult';
+                speedTestResult.style.marginTop = '10px';
+                container.querySelector('.wifi-diagnostics-panel').appendChild(speedTestResult);
+            }
+
+            async function runSpeedTest() {
+                const button = document.getElementById('speedTestButton');
+                const resultDiv = document.getElementById('speedTestResult');
+                
+                button.disabled = true;
+                button.textContent = '⏳ Тестирование...';
+                resultDiv.innerHTML = '<p>Выполняется тест скорости...</p>';
+                
+                const result = await window.wifiDiagnostics.runSpeedTest();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="speed-test-result">
+                            <h4>✅ Результаты теста скорости:</h4>
+                            <p><strong>Время загрузки:</strong> ${result.loadTime} мс</p>
+                            <p><strong>Размер файла:</strong> ${result.sizeKB} КБ</p>
+                            <p><strong>Скорость:</strong> ${result.speedKBps} КБ/с</p>
+                            <p style="font-size: 0.85rem; color: #888;"><em>Тестовый файл: ${result.url}</em></p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="speed-test-result speed-test-error">
+                            <h4>❌ Ошибка теста:</h4>
+                            <p>${result.error}</p>
+                        </div>
+                    `;
+                }
+                
+                button.disabled = false;
+                button.textContent = '⚡ Запустить тест скорости';
+            }
+
+            // Подписываемся на изменения соединения
+            window.wifiDiagnostics.onChange((data) => {
+                if (isVisible) {
+                    updateDiagnostics();
+                    // Показываем уведомление об изменении
+                    const notification = document.createElement('div');
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 20px;
+                        right: 20px;
+                        background: #3498db;
+                        color: white;
+                        padding: 15px 20px;
+                        border-radius: 8px;
+                        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+                        z-index: 1000;
+                        animation: slideIn 0.3s ease-out;
+                    `;
+                    notification.textContent = '📡 Соединение изменилось!';
+                    document.body.appendChild(notification);
+                    
+                    setTimeout(() => {
+                        notification.style.animation = 'slideOut 0.3s ease-in';
+                        setTimeout(() => notification.remove(), 300);
+                    }, 3000);
+                }
+            });
+        });
+        
             themeToggle.innerHTML = '🌞';
         } else {
             themeToggle.innerHTML = '🌜';
