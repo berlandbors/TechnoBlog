@@ -74,8 +74,9 @@ class WiFiDiagnostics {
 
     // Генерировать URL для теста (используем текущий сайт)
     generateTestUrl() {
-        // Используем иконку сайта для теста скорости
-        return 'icons/PBAB.jpg?' + new Date().getTime();
+        // Используем иконку сайта для теста скорости (с абсолютным путем от корня)
+        const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '');
+        return baseUrl + '/icons/PBAB.jpg?' + new Date().getTime();
     }
 
     // Измерить задержку (ping)
@@ -171,29 +172,44 @@ class WiFiDiagnostics {
 
     // Мониторинг изменений соединения
     startMonitoring(callback) {
+        // Сохраняем ссылки на обработчики для корректной очистки
+        this._connectionHandler = () => {
+            const info = this.getConnectionType();
+            callback('connection', info);
+        };
+        
+        this._onlineHandler = () => {
+            callback('online', { online: true, timestamp: new Date().toISOString() });
+        };
+        
+        this._offlineHandler = () => {
+            callback('offline', { online: false, timestamp: new Date().toISOString() });
+        };
+
         if (this.connection) {
-            this.connection.addEventListener('change', () => {
-                const info = this.getConnectionType();
-                callback('connection', info);
-            });
+            this.connection.addEventListener('change', this._connectionHandler);
         }
 
-        window.addEventListener('online', () => {
-            callback('online', { online: true, timestamp: new Date().toISOString() });
-        });
-
-        window.addEventListener('offline', () => {
-            callback('offline', { online: false, timestamp: new Date().toISOString() });
-        });
+        window.addEventListener('online', this._onlineHandler);
+        window.addEventListener('offline', this._offlineHandler);
     }
 
     // Остановить мониторинг
     stopMonitoring() {
-        if (this.connection) {
-            this.connection.removeEventListener('change', null);
+        if (this.connection && this._connectionHandler) {
+            this.connection.removeEventListener('change', this._connectionHandler);
         }
-        window.removeEventListener('online', null);
-        window.removeEventListener('offline', null);
+        if (this._onlineHandler) {
+            window.removeEventListener('online', this._onlineHandler);
+        }
+        if (this._offlineHandler) {
+            window.removeEventListener('offline', this._offlineHandler);
+        }
+        
+        // Очистка ссылок
+        this._connectionHandler = null;
+        this._onlineHandler = null;
+        this._offlineHandler = null;
     }
 
     // Экспортировать результаты диагностики
