@@ -175,10 +175,12 @@
         }
 
         // WiFi Diagnostics Toggle
-        document.addEventListener('DOMContentLoaded', () => {
+        (function() {
             const toggleButton = document.getElementById('wifiDiagnosticsToggle');
             const container = document.getElementById('wifiDiagnosticsContainer');
             let isVisible = false;
+
+            if (!toggleButton || !container) return;
 
             toggleButton.addEventListener('click', () => {
                 isVisible = !isVisible;
@@ -277,12 +279,7 @@
                     }, 3000);
                 }
             });
-        });
-        
-            themeToggle.innerHTML = '🌞';
-        } else {
-            themeToggle.innerHTML = '🌜';
-        }
+        })();
         </script>
 
 <script data-goatcounter="https://berlandbor.goatcounter.com/count"
