@@ -59,10 +59,10 @@
 </head>
 
 <body>
-    <h1 style="color: #3498db; text-shadow: 2px 2px 4px rgba(62, 55, 55, 0.5);">Tchno Blog - о моих веб разработках.</h1>
+    <h1 style="color: #00ff99; text-shadow: 0 0 10px rgba(0, 255, 153, 0.5);">Tchno Blog - о моих веб разработках.<span class="cursor">█</span></h1>
 <!--img src="https://berlandbors.github.io/TechnoBlog/icons/favicon.svg" alt="Читайте в ТехноБлоге..." style="width:250px; height:auto;"-->
-<h3>👾</h3>
-<h3 style="color: #808080"><em>Проект Берлина Андрея.</em></h3>
+<h3 style="color: #33ff88;">[*]</h3>
+<h3 style="color: #66ffaa"><em>Проект Берлина Андрея.</em></h3>
 <h4>веб разработки - инструменты для жизни.</h4>
 
 
@@ -113,9 +113,9 @@
 
     <!-- Кнопки для переключения страниц -->
     <div class="pagination">
-        <button id="prevPage">← Назад</button>
+        <button id="prevPage">[ ← НАЗАД ]</button>
         <span id="pageNumber">Страница 1</span>
-        <button id="nextPage">Вперёд →</button>
+        <button id="nextPage">[ ВПЕРЁД → ]</button>
     </div>
 
 <hr><pstyle="color: #FF0000">Все свои отзывы и пожелания присылайте сюда:</p>
@@ -124,7 +124,7 @@
     <li>Email: <a href="mailto:andrew.berlin96@gmail.com">andrew.berlin96@gmail.com</a></li>
 </ul><hr>
 
-<p style="color: #3498db"><em>Этот Блог написан на языках Веб Кодинга: HTML, CSS, JS - Берлиным Андреем. Весь код этого блога и его содержимое принадлежит Берлину Андрею.</em></p>
+<p style="color: #66ffaa"><em>Этот Блог написан на языках Веб Кодинга: HTML, CSS, JS - Берлиным Андреем. Весь код этого блога и его содержимое принадлежит Берлину Андрею.</em></p>
 <p>© Берлин Андрей</p>
 
    
@@ -144,7 +144,7 @@
         // Переключение темы
         const themeToggle = document.createElement('button');
         themeToggle.className = 'theme-toggle';
-        themeToggle.innerHTML = '🌓';
+        themeToggle.innerHTML = '[⚙]';
         themeToggle.title = 'Переключить тему';
         document.body.appendChild(themeToggle);
         
@@ -152,15 +152,15 @@
             document.body.classList.toggle('dark-theme');
             const isDark = document.body.classList.contains('dark-theme');
             localStorage.setItem('darkTheme', isDark);
-            themeToggle.innerHTML = isDark ? '🌞' : '🌜';
+            themeToggle.innerHTML = isDark ? '[☀]' : '[☽]';
         });
         
         // Проверка сохраненной темы
         if (localStorage.getItem('darkTheme') === 'true') {
             document.body.classList.add('dark-theme');
-            themeToggle.innerHTML = '🌞';
+            themeToggle.innerHTML = '[☀]';
         } else {
-            themeToggle.innerHTML = '🌜';
+            themeToggle.innerHTML = '[☽]';
         }
         </script>
 
