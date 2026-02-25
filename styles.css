@@ -1,51 +1,81 @@
+/* Мерцающий курсор */
+@keyframes blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+}
+
+.cursor {
+    animation: blink 1s infinite;
+    color: #00ff99;
+}
+
+/* Эффект сканлайнов */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 3px,
+        rgba(0, 0, 0, 0.07) 3px,
+        rgba(0, 0, 0, 0.07) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+}
+
 /* Основные стили */
 body {
-    font-family: Georgia, sans-serif;
+    font-family: 'Courier New', 'Consolas', 'Monaco', monospace;
     margin: 20px;
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
     line-height: 1.6;
-    color: #333;
-    background-color: #fff;
+    color: #33ff88;
+    background-color: #0a0a0a;
     transition: background-color 0.3s, color 0.3s;
 }
 
 /* Темная тема */
 body.dark-theme {
-    color: #e0e0e0;
-    background-color: #121212;
+    color: #33ff88;
+    background-color: #050505;
 }
 
 body.dark-theme h1,
 body.dark-theme h2,
 body.dark-theme h3 {
-    color: #ffffff;
+    color: #00ff99;
 }
 
 body.dark-theme #toc-container {
-    background-color: #1e1e1e;
-    border-color: #444;
+    background-color: #0a0a0a;
+    border-color: rgba(0, 255, 136, 0.4);
 }
 
 body.dark-theme .post {
-    border-color: #444;
+    border-color: rgba(0, 255, 136, 0.3);
 }
 
 body.dark-theme blockquote {
-    background: #2d2d2d;
-    border-color: #555;
-    color: #ccc;
+    background: #0d0d0d;
+    border-color: rgba(0, 255, 136, 0.4);
+    color: #66ffaa;
 }
 
 body.dark-theme pre,
 body.dark-theme code {
-    background: #2d2d2d;
-    color: #f8f8f2;
+    background: #0d0d0d;
+    color: #66ffaa;
 }
 
 body.dark-theme hr {
-    border-top-color: #444;
+    border-top-color: rgba(0, 255, 136, 0.3);
 }
 
 /* Кнопка переключения темы */
@@ -53,20 +83,25 @@ body.dark-theme hr {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    padding: 10px;
-    background: #007BFF;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
+    padding: 8px 12px;
+    background: transparent;
+    color: #33ff88;
+    border: 2px solid #00ff88;
+    border-radius: 0;
+    width: auto;
+    height: auto;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    text-shadow: 0 0 5px rgba(51, 255, 136, 0.5);
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.2);
     z-index: 1000;
+    transition: box-shadow 0.3s, background 0.3s;
 }
 
 .theme-toggle:hover {
-    background: #0056b3;
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
 }
 
 /* Оглавление (меню содержания) */
@@ -75,11 +110,11 @@ body.dark-theme hr {
     max-width: 300px;
     max-height: 300px;
     overflow-y: auto;
-    border: 1px solid #ccc;
+    border: 1px solid rgba(0, 255, 136, 0.4);
     padding: 10px;
-    background-color: #f9f9f9;
+    background-color: #0f0f0f;
     margin-bottom: 20px;
-    border-radius: 5px;
+    border-radius: 0;
 }
 
 #toc-container h2 {
@@ -95,12 +130,12 @@ body.dark-theme hr {
 
 #toc li {
     padding: 5px;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid rgba(0, 255, 136, 0.2);
 }
 
 #toc a {
     text-decoration: none;
-    color: #007bff;
+    color: #66ffaa;
     cursor: pointer;
     display: block;
 }
@@ -111,7 +146,7 @@ body.dark-theme hr {
 
 /* Стили для статей */
 .post {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid rgba(0, 255, 136, 0.25);
     padding: 15px 0;
 }
 
@@ -122,24 +157,30 @@ body.dark-theme hr {
 }
 
 .pagination button {
-    padding: 10px 15px;
-    font-size: 16px;
+    padding: 8px 16px;
+    font-size: 14px;
     cursor: pointer;
-    border: none;
-    background-color: #007bff;
-    color: white;
+    border: 2px solid #00ff88;
+    background: transparent;
+    color: #33ff88;
     margin: 5px;
-    border-radius: 5px;
-    transition: background-color 0.3s;
+    border-radius: 0;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 5px rgba(51, 255, 136, 0.5);
+    transition: background 0.3s, box-shadow 0.3s;
 }
 
 .pagination button:hover {
-    background-color: #0056b3;
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
 .pagination button:disabled {
-    background-color: #ccc;
+    border-color: rgba(0, 255, 136, 0.2);
+    color: rgba(51, 255, 136, 0.3);
     cursor: not-allowed;
+    box-shadow: none;
+    background: transparent;
 }
 
 /* Поле поиска */
@@ -154,53 +195,75 @@ body.dark-theme hr {
 
 .search-container input {
     width: 100%;
-    padding: 12px 40px 12px 15px;
-    font-size: 16px;
-    border: 2px solid #ccc;
-    border-radius: 25px;
+    padding: 10px 40px 10px 30px;
+    font-size: 14px;
+    border: 2px solid rgba(0, 255, 136, 0.4);
+    border-radius: 0;
     outline: none;
     transition: 0.3s;
-    background-color: #fff;
+    background-color: #0f0f0f;
+    color: #33ff88;
+    font-family: 'Courier New', monospace;
+}
+
+.search-container input::placeholder {
+    color: rgba(51, 255, 136, 0.4);
 }
 
 .search-container input:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+    border-color: #00ff88;
+    box-shadow: 0 0 8px rgba(0, 255, 136, 0.3);
+}
+
+/* Префикс > для поля поиска */
+.search-container::before {
+    content: ">";
+    font-size: 16px;
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #33ff88;
+    pointer-events: none;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 5px rgba(51, 255, 136, 0.5);
+    z-index: 1;
 }
 
 /* Иконка 🔍 */
 .search-container::after {
     content: "🔍";
-    font-size: 18px;
+    font-size: 16px;
     position: absolute;
-    right: 15px;
+    right: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: #aaa;
+    color: rgba(51, 255, 136, 0.5);
     pointer-events: none;
 }
 
 /* Заголовки */
 h1, h2, h3 {
-    color: #222;
+    color: #00ff99;
     margin-top: 20px;
+    text-shadow: 0 0 8px rgba(0, 255, 153, 0.4);
 }
 
 h1 {
     font-size: 2rem;
-    border-bottom: 3px solid #007BFF;
+    border-bottom: 2px solid rgba(0, 255, 136, 0.5);
     padding-bottom: 5px;
 }
 
 h2 {
     font-size: 1.5rem;
-    border-left: 4px solid #007BFF;
+    border-left: 3px solid #00ff88;
     padding-left: 8px;
 }
 
 h3 {
     font-size: 1.25rem;
-    color: #555;
+    color: #66ffaa;
 }
 
 /* Текстовые элементы */
@@ -209,12 +272,14 @@ p {
 }
 
 a {
-    color: #007BFF;
+    color: #66ffaa;
     text-decoration: none;
 }
 
 a:hover {
     text-decoration: underline;
+    color: #88ffbb;
+    text-shadow: 0 0 6px rgba(136, 255, 187, 0.4);
 }
 
 /* Списки */
@@ -225,21 +290,23 @@ ul, ol {
 
 /* Цитаты */
 blockquote {
-    border-left: 4px solid #ccc;
+    border-left: 3px solid rgba(0, 255, 136, 0.5);
     padding-left: 15px;
-    color: #666;
+    color: #66ffaa;
     font-style: italic;
-    background: #f4f4f4;
+    background: #0f0f0f;
     margin: 16px 0;
 }
 
 /* Кодовые блоки */
 pre, code {
-    background: #f4f4f4;
+    background: #0f0f0f;
     padding: 10px;
-    border-radius: 4px;
+    border-radius: 0;
     overflow-x: auto;
     font-family: 'Courier New', monospace;
+    color: #66ffaa;
+    border: 1px solid rgba(0, 255, 136, 0.2);
 }
 
 pre {
@@ -262,23 +329,26 @@ audio {
 /* Горизонтальная линия */
 hr {
     border: none;
-    border-top: 2px solid #eee;
+    border-top: 1px solid rgba(0, 255, 136, 0.3);
     margin: 24px 0;
 }
 
 /* Кнопки */
 button {
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
+    background: transparent;
+    color: #33ff88;
+    border: 2px solid #00ff88;
+    padding: 8px 16px;
+    border-radius: 0;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 5px rgba(51, 255, 136, 0.5);
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background: rgba(0, 255, 136, 0.1);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
 }
 
 /* Плавный скролл */
@@ -296,18 +366,20 @@ html {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0,0,0,0.7);
 }
 
 .modal-content {
-    background-color: #fff;
+    background-color: #0f0f0f;
+    border: 1px solid rgba(0, 255, 136, 0.4);
     margin: 10% auto;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 0;
     width: 90%;
     max-width: 600px;
     text-align: center;
     position: relative;
+    color: #33ff88;
 }
 
 .close {
@@ -323,8 +395,8 @@ input[type=range] {
 }
 
 .spinner {
-    border: 8px solid #f3f3f3;
-    border-top: 8px solid #3498db;
+    border: 4px solid rgba(0, 255, 136, 0.2);
+    border-top: 4px solid #33ff88;
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -389,17 +461,12 @@ input[type=range] {
     }
     
     .pagination button {
-        padding: 8px 12px;
-        font-size: 14px;
+        padding: 6px 10px;
+        font-size: 13px;
     }
     
     .search-container input {
-        padding: 10px 35px 10px 12px;
-        font-size: 14px;
-    }
-    
-    .search-container::after {
-        font-size: 16px;
-        right: 12px;
+        padding: 8px 35px 8px 24px;
+        font-size: 13px;
     }
 }
