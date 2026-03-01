@@ -1,4 +1,4 @@
-// CoreBlog.js с Lazy Loading, индикатором загрузки и модальным окном для озвучки (без кэширования)
+// CoreTTWP.js с Lazy Loading, индикатором загрузки и модальным окном для статей (без кэширования)
 
 document.addEventListener("DOMContentLoaded", async () => {
     const postsListFile = "posts/list.txt";
@@ -87,16 +87,56 @@ document.addEventListener("DOMContentLoaded", async () => {
         displayPosts();
     }
 
-    // Генерация оглавления
-    function generateTOC() {
-        tocContainer.innerHTML = "<ul>";
-        filteredPosts.forEach((post, index) => {
-            const postSlug = transliterate(post.title);
-            tocContainer.innerHTML += `<li><a href="?article=${index}&title=${postSlug}">${post.title}</a></li>`;
-        });
-        tocContainer.innerHTML += "</ul>";
+    // Эффект печати символ за символом (typing effect)
+    function typeWriter(element, text, speed, callback) {
+        let i = 0;
+        element.textContent = '';
+        // Добавляем класс мигающего курсора во время печати
+        element.classList.add('typing-active');
+        function type() {
+            if (i < text.length) {
+                element.textContent += text.charAt(i);
+                i++;
+                setTimeout(type, speed);
+            } else {
+                // Убираем курсор после завершения печати
+                element.classList.remove('typing-active');
+                if (callback) callback();
+            }
+        }
+        type();
     }
-    
+
+    // Генерация оглавления с эффектом печати
+    function generateTOC() {
+        tocContainer.innerHTML = "";
+        const ul = document.createElement("ul");
+
+        // Создаём элементы списка и собираем их для последовательного эффекта печати
+        const items = filteredPosts.map((post, index) => {
+            const li = document.createElement("li");
+            const a = document.createElement("a");
+            a.href = "#";
+            // Клик по ссылке показывает только заголовок в основной области
+            a.addEventListener("click", (e) => {
+                e.preventDefault();
+                displayPostTitles(index);
+            });
+            li.appendChild(a);
+            ul.appendChild(li);
+            return { element: a, text: post.title };
+        });
+
+        tocContainer.appendChild(ul);
+
+        // Запускаем эффект печати последовательно для каждого элемента (30-50 мс на символ)
+        function typeNext(i) {
+            if (i >= items.length) return;
+            typeWriter(items[i].element, items[i].text, 40, () => typeNext(i + 1));
+        }
+        typeNext(0);
+    }
+
     function generateMetaTags(post) {
     const head = document.getElementsByTagName('head')[0];
 
@@ -166,7 +206,57 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 }
 
-    // Отображение постов
+    // Показывает только заголовок статьи в основной области (первый уровень навигации)
+    function displayPostTitles(postIndex) {
+        blogContainer.innerHTML = "";
+        const post = filteredPosts[postIndex];
+        if (!post) return;
+
+        const article = document.createElement("div");
+        article.classList.add("post");
+
+        const titleEl = document.createElement("h2");
+        titleEl.classList.add("post-title-link");
+        titleEl.textContent = post.title;
+        // Клик по заголовку открывает полную статью в модальном окне
+        titleEl.addEventListener("click", () => openArticleModal(postIndex));
+
+        article.appendChild(titleEl);
+        blogContainer.appendChild(article);
+        scrollToTop();
+    }
+
+    // Открывает модальное окно с полной статьёй (второй уровень навигации)
+    function openArticleModal(postIndex) {
+        const post = filteredPosts[postIndex];
+        if (!post) return;
+
+        const modal = document.getElementById("articleModal");
+        const articleContent = document.getElementById("articleContent");
+
+        const postSlug = transliterate(post.title);
+        const articleURL = `${window.location.origin}${window.location.pathname}?article=${postIndex}&title=${postSlug}`;
+        const processedContent = linkify(post.content);
+        const shortContent = post.content.length > 555
+            ? post.content.substring(0, 555) + "..."
+            : post.content;
+
+        articleContent.innerHTML = `
+            <h2>${post.title}</h2>
+            <p><small>${post.date}</small></p>
+            <div class="article-body">${processedContent}</div>
+            <p>
+                <button class="copy-link" data-link="${articleURL}">🔗 Скопировать ссылку</button>
+                <button class="share-link" data-title="${post.title}" data-content="${shortContent}" data-url="${articleURL}">📤 Поделиться!</button>
+            </p>
+        `;
+
+        modal.style.display = "block";
+        generateMetaTags(post);
+        setupCopyAndShare();
+    }
+
+    // Отображение постов — показывает только заголовки (кликабельны для открытия модального окна)
     function displayPosts() {
         blogContainer.innerHTML = "";
 
@@ -176,42 +266,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         const pagePosts = filteredPosts.slice(startIndex, endIndex);
 
         pagePosts.forEach((post, i) => {
-            const postSlug = transliterate(post.title);
-            const articleURL = `${window.location.origin}${window.location.pathname}?article=${startIndex}&title=${postSlug}`;
-
-            const processedContent = linkify(post.content);
-
-            const shortContent = post.content.length > 555
-                ? post.content.substring(0, 555) + "..."
-                : post.content;
+            const postIndex = startIndex + i;
 
             const article = document.createElement("div");
             article.classList.add("post");
-            article.innerHTML = `
-                <h2>${post.title}</h2>
-                <p><small>${post.date}</small></p>
-                <div>${processedContent}</div>
-                <p>
-                    <button class="copy-link" data-link="${articleURL}">🔗 Скопировать ссылку</button>
-                    <button class="share-link" data-title="${post.title}" data-content="${shortContent}" data-url="${articleURL}">📤 Поделиться!</button><hr>
-                    <!--button class="speak-text" data-text="${post.content}">🔊 Озвучить</button-->
-                </p>
-                
-            `;
+
+            // Только заголовок — клик открывает полную статью в модальном окне
+            const titleEl = document.createElement("h2");
+            titleEl.classList.add("post-title-link");
+            titleEl.textContent = post.title;
+            titleEl.addEventListener("click", () => openArticleModal(postIndex));
+
+            article.appendChild(titleEl);
             blogContainer.appendChild(article);
-            // Генерация метатегов для соцсетей
-             generateMetaTags(post);
         });
 
         pageNumber.textContent = `Страница ${currentPage}`;
         prevButton.disabled = currentPage === 1;
         nextButton.disabled = currentPage >= totalPages;
 
-        setupCopyAndShare();
         scrollToTop();
     }
 
-    // События для кнопок
+    // События для кнопок копирования и поделиться
     function setupCopyAndShare() {
         document.querySelectorAll(".copy-link").forEach(button => {
             button.addEventListener("click", (event) => {
@@ -268,7 +345,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         displayPosts();
     }
 
-    // Проверка URL для прямой ссылки
+    // Проверка URL для прямой ссылки — автоматически открывает модальное окно
     function checkURLForArticle() {
         const params = new URLSearchParams(window.location.search);
         if (params.has("article")) {
@@ -277,9 +354,31 @@ document.addEventListener("DOMContentLoaded", async () => {
                 currentPage = articleIndex + 1;
                 displayPosts();
                 document.title = params.get("title").replace(/-/g, " ");
+                // Автоматически открываем модальное окно для прямой ссылки
+                openArticleModal(articleIndex);
             }
         }
     }
+
+    // Закрытие модального окна статьи
+    const articleModal = document.getElementById("articleModal");
+    document.getElementById("closeArticleModal").addEventListener("click", () => {
+        articleModal.style.display = "none";
+    });
+
+    // Закрытие по клику вне области модального окна
+    window.addEventListener("click", (event) => {
+        if (event.target === articleModal) {
+            articleModal.style.display = "none";
+        }
+    });
+
+    // Закрытие по клавише Escape
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && articleModal.style.display === "block") {
+            articleModal.style.display = "none";
+        }
+    });
 
     // Навешиваем события
     searchInput.addEventListener("input", searchPosts);
@@ -300,3 +399,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadPostList();
 
 });
+
