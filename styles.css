@@ -746,3 +746,104 @@ input[type=range] {
         font-size: 13px;
     }
 }
+
+/* === Режим чтения === */
+.reader-mode #articleContent {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 40px;
+}
+
+#readerModeBtn {
+    position: absolute;
+    top: 10px;
+    right: 50px;
+    padding: 6px 12px;
+    background: rgba(0, 255, 153, 0.15);
+    border: 1px solid #00ff99;
+    color: #00ff99;
+    cursor: pointer;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    transition: background 0.3s;
+    text-shadow: none;
+}
+
+#readerModeBtn:hover {
+    background: rgba(0, 255, 153, 0.35);
+    box-shadow: 0 0 8px rgba(0, 255, 153, 0.4);
+}
+
+/* === Кнопка экспорта в PDF === */
+#exportPdfBtn {
+    position: absolute;
+    top: 10px;
+    right: 195px;
+    padding: 6px 12px;
+    background: rgba(255, 176, 0, 0.15);
+    border: 1px solid #ffb000;
+    color: #ffb000;
+    cursor: pointer;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    transition: background 0.3s;
+    text-shadow: none;
+}
+
+#exportPdfBtn:hover {
+    background: rgba(255, 176, 0, 0.35);
+    box-shadow: 0 0 8px rgba(255, 176, 0, 0.4);
+}
+
+/* === Контейнер комментариев Utterances === */
+#utterances-container {
+    margin-top: 20px;
+    border-top: 1px solid rgba(255, 153, 0, 0.3);
+    padding-top: 10px;
+}
+
+/* === Стили для Markdown-элементов (marked.js) === */
+.article-body table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+    font-family: 'Courier New', monospace;
+}
+
+.article-body th,
+.article-body td {
+    border: 1px solid rgba(255, 153, 0, 0.4);
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.article-body th {
+    background: rgba(255, 153, 0, 0.1);
+    color: #ffa500;
+}
+
+.article-body pre {
+    position: relative;
+    overflow-x: auto;
+}
+
+.article-body pre code {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+/* Адаптация кнопок модального окна для мобильных */
+@media (max-width: 768px) {
+    #readerModeBtn,
+    #exportPdfBtn {
+        font-size: 10px;
+        padding: 4px 8px;
+    }
+
+    #exportPdfBtn {
+        right: 160px;
+    }
+}

@@ -1,11 +1,36 @@
 // CoreTTWP.js с Lazy Loading, индикатором загрузки и модальным окном для статей (без кэширования)
 
+// Настройка marked.js с подсветкой синтаксиса через highlight.js (если загружены)
+if (typeof marked !== 'undefined' && typeof hljs !== 'undefined') {
+    marked.setOptions({
+        highlight: function(code, lang) {
+            if (lang && hljs.getLanguage(lang)) {
+                return hljs.highlight(code, { language: lang }).value;
+            }
+            return hljs.highlightAuto(code).value;
+        },
+        breaks: true,
+        gfm: true
+    });
+} else if (typeof marked !== 'undefined') {
+    marked.setOptions({ breaks: true, gfm: true });
+}
+
+// Полноценный Markdown-парсер на базе marked.js (с фолбэком на linkify)
+function renderMarkdown(text) {
+    if (typeof marked !== 'undefined') {
+        return marked.parse(text);
+    }
+    return linkify(text);
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     const postsListFile = "posts/list.txt";
     const postsPerPage = 1;
     let currentPage = 1;
     let allPosts = [];
     let filteredPosts = [];
+    let fuseInstance;
 
     const blogContainer = document.getElementById("blog");
     const tocContainer = document.getElementById("toc");
@@ -82,6 +107,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         filteredPosts = [...allPosts];
+
+        // Создаём индекс Fuse.js для нечёткого поиска (если библиотека загружена)
+        if (typeof Fuse !== 'undefined') {
+            fuseInstance = new Fuse(allPosts, {
+                keys: [
+                    { name: 'title', weight: 3 },
+                    { name: 'content', weight: 1 },
+                    { name: 'date', weight: 2 }
+                ],
+                threshold: 0.3,
+                includeScore: true,
+                includeMatches: true
+            });
+        }
+
         generateTOC();
         checkURLForArticle();
         displayPosts();
@@ -236,7 +276,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         const postSlug = transliterate(post.title);
         const articleURL = `${window.location.origin}${window.location.pathname}?article=${postIndex}&title=${postSlug}`;
-        const processedContent = linkify(post.content);
+        const processedContent = renderMarkdown(post.content);
         const shortContent = post.content.length > 555
             ? post.content.substring(0, 555) + "..."
             : post.content;
@@ -249,7 +289,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                 <button class="copy-link" data-link="${articleURL}">🔗 Скопировать ссылку</button>
                 <button class="share-link" data-title="${post.title}" data-content="${shortContent}" data-url="${articleURL}">📤 Поделиться!</button>
             </p>
+            <div id="utterances-container"></div>
         `;
+
+        // Добавляем виджет комментариев Utterances
+        const utterancesScript = document.createElement('script');
+        utterancesScript.src = 'https://utteranc.es/client.js';
+        utterancesScript.setAttribute('repo', 'berlandbors/TechnoBlog');
+        utterancesScript.setAttribute('issue-term', 'pathname');
+        utterancesScript.setAttribute('theme', 'github-dark');
+        utterancesScript.setAttribute('crossorigin', 'anonymous');
+        utterancesScript.async = true;
+        document.getElementById('utterances-container').appendChild(utterancesScript);
 
         modal.style.display = "block";
         generateMetaTags(post);
@@ -333,16 +384,46 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    // Поиск по статьям
+    // Поиск по статьям с использованием Fuse.js (нечёткий поиск)
     function searchPosts() {
-        const searchQuery = searchInput.value.toLowerCase();
-        filteredPosts = allPosts.filter(post =>
-            post.title.toLowerCase().includes(searchQuery) ||
-            post.content.toLowerCase().includes(searchQuery)
-        );
+        const query = searchInput.value.trim();
+
+        if (!query) {
+            filteredPosts = allPosts;
+            currentPage = 1;
+            generateTOC();
+            displayPosts();
+            return;
+        }
+
+        const startTime = performance.now();
+
+        if (fuseInstance) {
+            const results = fuseInstance.search(query);
+            filteredPosts = results.map(result => result.item);
+        } else {
+            // Фолбэк на простой поиск если Fuse не загружен
+            filteredPosts = allPosts.filter(post =>
+                post.title.toLowerCase().includes(query.toLowerCase()) ||
+                post.content.toLowerCase().includes(query.toLowerCase())
+            );
+        }
+
+        const endTime = performance.now();
+        console.log(`Поиск завершен за ${(endTime - startTime).toFixed(2)}мс`);
+
         currentPage = 1;
         generateTOC();
         displayPosts();
+
+        // Показать количество результатов
+        const resultsInfo = document.createElement('p');
+        resultsInfo.textContent = `Найдено: ${filteredPosts.length} (${(endTime - startTime).toFixed(2)}мс)`;
+        resultsInfo.style.color = '#00ff99';
+        resultsInfo.style.fontSize = '12px';
+        resultsInfo.style.margin = '4px 0 0 0';
+        document.querySelector('.search-container').appendChild(resultsInfo);
+        setTimeout(() => resultsInfo.remove(), 3000);
     }
 
     // Проверка URL для прямой ссылки — автоматически открывает модальное окно

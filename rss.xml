@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>ТехноБлог</title>
+    <link>https://berlandbors.github.io/TechnoBlog</link>
+    <description>Браузерные технологии, веб приложения, инструменты для жизни</description>
+    <item>
+      <title>О ТехноБлоге</title>
+      <link>https://berlandbors.github.io/TechnoBlog/?article=0&title=%D0%BE-%D1%82%D0%B5%D1%85%D0%BD%D0%BE%D0%B1%D0%BB%D0%BE%D0%B3%D0%B5</link>
+      <description>Привет! Меня зовут Андрей Берлин, и я создал этот блог, чтобы делиться своими веб-разработками и полезными браузерными инструментами.  Я увлечен веб-технологиями и верю, что современные браузеры — это...</description>
+      <pubDate>Mon, 02 Mar 2026 08:42:46 GMT</pubDate>
+    </item>
+    <item>
+      <title>Обзор моего IPTV-плеера Berlandbor MediaPlayer</title>
+      <link>https://berlandbors.github.io/TechnoBlog/?article=1&title=%D0%BE%D0%B1%D0%B7%D0%BE%D1%80-%D0%BC%D0%BE%D0%B5%D0%B3%D0%BE-iptv-%D0%BF%D0%BB%D0%B5%D0%B5%D1%80%D0%B0-berlandbor-mediaplayer</link>
+      <description>## Введение  Привет! Хочу поделиться своим проектом - **Berlandbor MediaPlayer**. Это веб-плеер для воспроизведения IPTV-потоков, который я разработал на чистом JavaScript без использования фреймворко...</description>
+      <pubDate>Mon, 02 Mar 2026 08:42:46 GMT</pubDate>
+    </item>
+    <item>
+      <title>О MediaPlayer4</title>
+      <link>https://berlandbors.github.io/TechnoBlog/?article=2&title=%D0%BE-mediaplayer4</link>
+      <description>Привет! Это простой и удобный IPTV-плеер, который работает прямо в браузере — без установки программ и регистрации.  https://berlandbors.github.io/MediaPlayer4/  ## Что это?  MediaPlayer4 — это веб-пр...</description>
+      <pubDate>Mon, 02 Mar 2026 08:42:46 GMT</pubDate>
+    </item>
+    <item>
+      <title>Технический обзор приложения &quot;WiFi Диагностика&quot;</title>
+      <link>https://berlandbors.github.io/TechnoBlog/?article=3&title=%D1%82%D0%B5%D1%85%D0%BD%D0%B8%D1%87%D0%B5%D1%81%D0%BA%D0%B8%D0%B9-%D0%BE%D0%B1%D0%B7%D0%BE%D1%80-%D0%BF%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F-wifi-%D0%B4%D0%B8%D0%B0%D0%B3%D0%BD%D0%BE%D1%81%D1%82%D0%B8%D0%BA%D0%B0-</link>
+      <description>Привет! Я, Андрей Берлин (Berlandbor), хочу рассказать о структуре и технических особенностях моего веб-приложения **WiFi Диагностика**. Приложение предназначено для оперативной диагностики состояния ...</description>
+      <pubDate>Mon, 02 Mar 2026 08:42:46 GMT</pubDate>
+    </item>
+  </channel>
+</rss>

@@ -56,6 +56,10 @@
 <meta name="msapplication-TileColor" content="#3498db">
    
     <link rel="stylesheet" href="styles.css">
+    <!-- RSS-лента -->
+    <link rel="alternate" type="application/rss+xml" title="ТехноБлог RSS" href="rss.xml">
+    <!-- highlight.js стили для подсветки кода -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
 </head>
 
 <body>
@@ -140,6 +144,15 @@
 
     <!--script src="main/speech.js"></script-->
     <!--script src="main/openAudioStream.js"></script-->
+    <!-- Fuse.js для нечёткого поиска -->
+    <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+    <!-- marked.js для полноценного Markdown-парсинга -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@11.0.0/marked.min.js"></script>
+    <!-- highlight.js для подсветки синтаксиса кода -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- jsPDF и html2canvas для экспорта в PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="main/linkify.js"></script>
     <script src="main/CoreTTWP.js"></script>
 
@@ -169,6 +182,97 @@
             themeToggle.innerHTML = '[☀]';
         } else {
             themeToggle.innerHTML = '[☽]';
+        }
+
+        // === Режим чтения ===
+        function toggleReaderMode() {
+            const isReaderMode = document.body.classList.toggle('reader-mode');
+            localStorage.setItem('readerMode', isReaderMode);
+
+            if (isReaderMode) {
+                document.getElementById('toc-container').style.display = 'none';
+                document.querySelector('.pagination').style.display = 'none';
+                document.querySelector('.search-container').style.display = 'none';
+                document.getElementById('articleContent').style.fontSize = '18px';
+                document.getElementById('articleContent').style.lineHeight = '1.8';
+            } else {
+                document.getElementById('toc-container').style.display = 'block';
+                document.querySelector('.pagination').style.display = 'flex';
+                document.querySelector('.search-container').style.display = 'block';
+                document.getElementById('articleContent').style.fontSize = '';
+                document.getElementById('articleContent').style.lineHeight = '';
+            }
+        }
+
+        // Кнопка режима чтения в модальном окне
+        const readerButton = document.createElement('button');
+        readerButton.textContent = '📖 Режим чтения';
+        readerButton.id = 'readerModeBtn';
+        readerButton.title = 'Режим чтения (Ctrl+R)';
+        readerButton.onclick = toggleReaderMode;
+        document.querySelector('#articleModal .modal-content').appendChild(readerButton);
+
+        // Горячая клавиша Ctrl/Cmd+R для режима чтения
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+                if (document.getElementById('articleModal').style.display === 'block') {
+                    e.preventDefault();
+                    toggleReaderMode();
+                }
+            }
+        });
+
+        // Восстановление режима чтения из localStorage
+        if (localStorage.getItem('readerMode') === 'true') {
+            document.body.classList.add('reader-mode');
+        }
+
+        // === Экспорт в PDF ===
+        async function exportToPDF() {
+            if (!window.jspdf) {
+                const msg = document.createElement('p');
+                msg.textContent = '⚠ jsPDF не загружен. Проверьте соединение.';
+                msg.style.cssText = 'color:#ff4444;font-size:12px;margin:4px 0;';
+                document.getElementById('articleContent').prepend(msg);
+                setTimeout(() => msg.remove(), 4000);
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const titleEl = document.querySelector('#articleContent h2');
+            const dateEl = document.querySelector('#articleContent p small');
+            const title = titleEl ? titleEl.textContent : 'Статья';
+            const date = dateEl ? dateEl.textContent : '';
+            const content = document.getElementById('articleContent').innerText;
+
+            doc.setFont('courier');
+            doc.setFontSize(16);
+            doc.text(title, 20, 20);
+
+            doc.setFontSize(10);
+            if (date) doc.text(date, 20, 30);
+
+            doc.setFontSize(12);
+            const lines = doc.splitTextToSize(content, 170);
+            doc.text(lines, 20, date ? 40 : 30);
+
+            doc.save(`TechnoBlog - ${title}.pdf`);
+        }
+
+        // Кнопка экспорта в PDF в модальном окне
+        const pdfButton = document.createElement('button');
+        pdfButton.textContent = '📥 Скачать PDF';
+        pdfButton.id = 'exportPdfBtn';
+        pdfButton.title = 'Скачать статью в PDF';
+        pdfButton.onclick = exportToPDF;
+        document.querySelector('#articleModal .modal-content').appendChild(pdfButton);
+
+        // === Service Worker ===
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/TechnoBlog/service-worker.js')
+                .then(() => console.log('Service Worker зарегистрирован'))
+                .catch(err => console.warn('Service Worker не зарегистрирован:', err));
         }
         </script>
 
