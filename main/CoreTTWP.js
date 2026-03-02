@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupCopyAndShare();
     }
 
-    // Отображение постов — показывает только заголовки (кликабельны для открытия модального окна)
+    // Отображение постов — карточки с превью и метаданными
     function displayPosts() {
         blogContainer.innerHTML = "";
 
@@ -319,17 +319,31 @@ document.addEventListener("DOMContentLoaded", async () => {
         pagePosts.forEach((post, i) => {
             const postIndex = startIndex + i;
 
-            const article = document.createElement("div");
-            article.classList.add("post");
+            const postCard = document.createElement("article");
+            postCard.className = "post-card";
+            postCard.style.animationDelay = `${i * 100}ms`;
 
-            // Только заголовок — клик открывает полную статью в модальном окне
-            const titleEl = document.createElement("h2");
-            titleEl.classList.add("post-title-link");
-            titleEl.textContent = post.title;
-            titleEl.addEventListener("click", () => openArticleModal(postIndex));
+            // Рассчитать время чтения (200 слов в минуту)
+            const wordCount = post.content.split(/\s+/).filter(w => w.length > 0).length;
+            const readTime = Math.max(1, Math.ceil(wordCount / 200));
 
-            article.appendChild(titleEl);
-            blogContainer.appendChild(article);
+            // Получить превью (первые 150 символов текста)
+            const previewText = post.content.replace(/[#*`\[\]]/g, '').substring(0, 150).trim() + '...';
+
+            postCard.innerHTML = `
+                <div class="post-card-header">
+                    <h2 class="post-card-title">${post.title}</h2>
+                    <span class="post-card-date">${post.date}</span>
+                </div>
+                <p class="post-card-preview">${previewText}</p>
+                <div class="post-card-meta">
+                    <span class="post-card-meta-item">Время чтения: ${readTime} мин</span>
+                    <span class="post-card-meta-item">Символов: ${post.content.length}</span>
+                </div>
+            `;
+
+            postCard.addEventListener("click", () => openArticleModal(postIndex));
+            blogContainer.appendChild(postCard);
         });
 
         pageNumber.textContent = `Страница ${currentPage}`;
