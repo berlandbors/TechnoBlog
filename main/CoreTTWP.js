@@ -225,12 +225,33 @@ document.addEventListener("DOMContentLoaded", async () => {
 }
 
     // Открывает модальное окно с полной статьёй
+    // Показать прогресс-бар загрузки статьи
+    function showArticleLoading() {
+        const loadingBar = document.getElementById('articleLoadingBar');
+        if (loadingBar) loadingBar.classList.add('active');
+    }
+
+    // Скрыть прогресс-бар загрузки статьи
+    function hideArticleLoading() {
+        const loadingBar = document.getElementById('articleLoadingBar');
+        if (loadingBar) {
+            // Небольшая задержка для плавного скрытия после завершения загрузки
+            setTimeout(() => loadingBar.classList.remove('active'), 300);
+        }
+    }
+
     function openArticleModal(postIndex) {
         const post = filteredPosts[postIndex];
         if (!post) return;
 
         const modal = document.getElementById("articleModal");
         const articleContent = document.getElementById("articleContent");
+
+        // Показываем модальное окно и прогресс-бар
+        modal.style.display = "block";
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => modal.classList.add('modal-visible'), 10);
+        showArticleLoading();
 
         const postSlug = transliterate(post.title);
         const articleURL = `${window.location.origin}${window.location.pathname}?article=${postIndex}&title=${postSlug}`;
@@ -280,9 +301,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (progressBar) progressBar.style.width = '0%';
         if (modalContentEl) modalContentEl.scrollTop = 0;
 
-        modal.style.display = "block";
-        document.body.style.overflow = 'hidden';
-        setTimeout(() => modal.classList.add('modal-visible'), 10);
+        // Настраиваем кнопки навигации между статьями
+        const prevBtn = document.getElementById('prevArticle');
+        const nextBtn = document.getElementById('nextArticle');
+        if (prevBtn && nextBtn) {
+            prevBtn.disabled = postIndex === 0;
+            nextBtn.disabled = postIndex === filteredPosts.length - 1;
+            prevBtn.onclick = () => {
+                if (postIndex > 0) openArticleModal(postIndex - 1);
+            };
+            nextBtn.onclick = () => {
+                if (postIndex < filteredPosts.length - 1) openArticleModal(postIndex + 1);
+            };
+        }
+
+        hideArticleLoading();
         generateMetaTags(post);
         setupCopyAndShare();
     }
@@ -478,10 +511,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    // Закрытие по клавише Escape
+    // Закрытие по клавише Escape и навигация стрелками
     document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape" && articleModal.style.display === "block") {
-            closeArticleModal();
+        if (articleModal.style.display === "block") {
+            if (event.key === "Escape") {
+                closeArticleModal();
+            } else if (event.key === "ArrowLeft") {
+                document.getElementById('prevArticle')?.click();
+            } else if (event.key === "ArrowRight") {
+                document.getElementById('nextArticle')?.click();
+            }
         }
     });
 

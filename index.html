@@ -132,7 +132,25 @@
 <div id="articleModal" class="modal">
     <div class="modal-content">
         <div class="modal-reading-progress" id="modalReadingProgress"></div>
-        <span class="close" id="closeArticleModal">&times;</span>
+        <span class="close" id="closeArticleModal" title="Закрыть (ESC)">✕</span>
+
+        <!-- Навигация между статьями -->
+        <div class="modal-navigation">
+            <button id="prevArticle" class="nav-article-btn prev-article" title="Предыдущая статья (←)">
+                <span class="nav-icon">◄</span>
+                <span class="nav-text">НАЗАД</span>
+            </button>
+            <button id="nextArticle" class="nav-article-btn next-article" title="Следующая статья (→)">
+                <span class="nav-text">ВПЕРЁД</span>
+                <span class="nav-icon">►</span>
+            </button>
+        </div>
+
+        <!-- Прогресс-бар загрузки статьи -->
+        <div id="articleLoadingBar" class="article-loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+
         <div id="articleContent"></div>
     </div>
 </div>
