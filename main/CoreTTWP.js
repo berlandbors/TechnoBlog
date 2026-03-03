@@ -260,7 +260,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (breadcrumbHome) {
             breadcrumbHome.addEventListener('click', (e) => {
                 e.preventDefault();
-                modal.style.display = 'none';
+                closeArticleModal();
             });
         }
 
@@ -281,8 +281,20 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (modalContentEl) modalContentEl.scrollTop = 0;
 
         modal.style.display = "block";
+        document.body.style.overflow = 'hidden';
+        setTimeout(() => modal.classList.add('modal-visible'), 10);
         generateMetaTags(post);
         setupCopyAndShare();
+    }
+
+    // Закрытие модального окна статьи с анимацией
+    function closeArticleModal() {
+        const modal = document.getElementById("articleModal");
+        modal.classList.remove('modal-visible');
+        setTimeout(() => {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }, 300);
     }
 
     // Отображение постов — карточки с превью и метаданными
@@ -445,7 +457,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Закрытие модального окна статьи
     const articleModal = document.getElementById("articleModal");
     document.getElementById("closeArticleModal").addEventListener("click", () => {
-        articleModal.style.display = "none";
+        closeArticleModal();
     });
 
     // Прогресс-бар чтения внутри модального окна
@@ -462,14 +474,14 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Закрытие по клику вне области модального окна
     window.addEventListener("click", (event) => {
         if (event.target === articleModal) {
-            articleModal.style.display = "none";
+            closeArticleModal();
         }
     });
 
     // Закрытие по клавише Escape
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && articleModal.style.display === "block") {
-            articleModal.style.display = "none";
+            closeArticleModal();
         }
     });
 
