@@ -719,7 +719,7 @@ html {
         0 0 30px rgba(255, 153, 0, 0.4),
         inset 0 0 15px rgba(255, 153, 0, 0.05);
     font-family: 'Courier New', monospace;
-    max-height: 80vh;
+    max-height: 90vh;
     overflow-y: auto;
     transform: translateY(-20px);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1045,14 +1045,15 @@ input[type=range] {
     }
 
     #articleModal .modal-content {
-        margin: 10px;
-        padding: 20px;
+        margin: var(--spacing-xs) auto;
+        padding: 1rem;
+        width: 95vw;
         border-radius: 12px;
     }
 
     .close {
-        width: 32px;
-        height: 32px;
+        width: 44px;
+        height: 44px;
         font-size: 24px;
     }
 }
@@ -1179,6 +1180,19 @@ input[type=range] {
 
     #exportPdfBtn {
         right: 160px;
+    }
+}
+
+@media (max-width: 480px) {
+    #readerModeBtn,
+    #exportPdfBtn {
+        position: static;
+        display: inline-block;
+        margin: var(--spacing-xs) var(--spacing-xs) 0 0;
+        font-size: 12px;
+        padding: 10px 14px;
+        min-height: 44px;
+        width: auto;
     }
 }
 
@@ -1685,6 +1699,7 @@ input[type=range] {
     .pagination button {
         padding: var(--spacing-xs) var(--spacing-sm);
         font-size: 0.875rem;
+        min-height: 44px;
     }
 }
 
@@ -1699,6 +1714,34 @@ input[type=range] {
 
     #pageNumber {
         padding: var(--spacing-xs);
+    }
+
+    .search-container {
+        max-width: 100%;
+    }
+
+    .search-clear {
+        padding: 0.25rem;
+        font-size: 0.8rem;
+    }
+
+    .scroll-to-top {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2rem;
+        bottom: var(--spacing-sm);
+        right: var(--spacing-sm);
+    }
+
+    .spinner {
+        width: 36px;
+        height: 36px;
+    }
+
+    .pagination button {
+        padding: var(--spacing-xs) 0.625rem;
+        font-size: 0.8rem;
+        min-height: 44px;
     }
 }
 
@@ -1877,13 +1920,13 @@ input[type=range] {
    АДАПТИВ ДЛЯ GRID КАРТОЧЕК
    ============================================ */
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     #blog.articles-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 480px) {
     #blog.articles-grid {
         grid-template-columns: 1fr;
     }

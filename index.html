@@ -74,7 +74,7 @@
         </div>
         <nav class="header-nav">
             <a href="#" class="nav-link active">Главная</a>
-            <button id="theme-toggle-header" class="theme-toggle-btn nav-link" title="Переключить тему">☽</button>
+            <button id="theme-toggle-header" class="theme-toggle-btn nav-link" title="Переключить тему" aria-label="Переключить тему">☽</button>
         </nav>
     </div>
 </header>
@@ -114,7 +114,7 @@
     <!-- Поле поиска -->
 <div class="search-container">
     <input type="text" id="searchInput" placeholder="Поиск по статьям... (/ для фокуса)" oninput="searchPosts()">
-    <button class="search-clear" id="searchClear" title="Очистить">✕</button>
+    <button class="search-clear" id="searchClear" title="Очистить" aria-label="Очистить поиск">✕</button>
 </div>
 <div id="searchResultsCount" class="search-results-count"></div>
     <div id="blog" class="articles-grid"></div>
@@ -129,10 +129,10 @@
 
 
 <!-- Модальное окно статьи -->
-<div id="articleModal" class="modal">
+<div id="articleModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="articleContent">
     <div class="modal-content">
         <div class="modal-reading-progress" id="modalReadingProgress"></div>
-        <span class="close" id="closeArticleModal" title="Закрыть (ESC)">✕</span>
+        <span class="close" id="closeArticleModal" role="button" tabindex="0" title="Закрыть (ESC)" aria-label="Закрыть">✕</span>
 
         <!-- Навигация между статьями -->
         <div class="modal-navigation">
@@ -183,6 +183,7 @@
         themeToggle.className = 'theme-toggle';
         themeToggle.innerHTML = '[⚙]';
         themeToggle.title = 'Переключить тему';
+        themeToggle.setAttribute('aria-label', 'Переключить тему');
         document.body.appendChild(themeToggle);
         
         themeToggle.addEventListener('click', () => {
@@ -223,6 +224,7 @@
         readerButton.textContent = '📖 Режим чтения';
         readerButton.id = 'readerModeBtn';
         readerButton.title = 'Режим чтения (Ctrl+R)';
+        readerButton.setAttribute('aria-label', 'Режим чтения');
         readerButton.onclick = toggleReaderMode;
         document.querySelector('#articleModal .modal-content').appendChild(readerButton);
 
@@ -347,6 +349,7 @@
         pdfButton.textContent = '📥 Скачать PDF';
         pdfButton.id = 'exportPdfBtn';
         pdfButton.title = 'Скачать статью в PDF';
+        pdfButton.setAttribute('aria-label', 'Скачать статью в PDF');
         pdfButton.onclick = exportToPDF;
         document.querySelector('#articleModal .modal-content').appendChild(pdfButton);
 
