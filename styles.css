@@ -122,6 +122,8 @@ body {
     );
     transition: background-color var(--transition-slow), color var(--transition-slow);
     font-size: var(--font-size-base);
+    /* Убираем скачки при появлении scrollbar */
+    overflow-y: scroll;
 }
 
 /* ============================================
@@ -406,8 +408,45 @@ body.dark-theme hr {
 
 /* Стили статей */
 .post {
-    border-bottom: 1px solid rgba(255, 153, 0, 0.25);
-    padding: 15px 0;
+    background: #0a0a0a;
+    border: 2px solid var(--color-primary);
+    border-radius: 0;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: none;
+    transition: background 0.3s ease, border-color 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.post::before {
+    content: '╔';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    color: var(--color-primary);
+    font-size: 20px;
+    line-height: 1;
+}
+
+.post::after {
+    content: '╗';
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    color: var(--color-primary);
+    font-size: 20px;
+    line-height: 1;
+}
+
+.post:hover {
+    background: rgba(0, 255, 153, 0.05);
+    border-color: var(--color-accent);
+}
+
+.post:hover::before,
+.post:hover::after {
+    color: var(--color-accent);
 }
 
 /* Кликабельный заголовок статьи (открывает модальное окно) */
@@ -752,30 +791,171 @@ html {
 
 .close {
     position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 36px;
-    height: 36px;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 28px;
-    font-weight: 300;
-    cursor: pointer;
-    color: var(--color-text-secondary);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 32px;
+    font-weight: 400;
+    color: #ff4444;
+    background: rgba(255, 68, 68, 0.15);
+    border: 2px solid #ff4444;
     border-radius: 8px;
+    cursor: pointer;
     transition: all 0.3s ease;
-    z-index: 10;
+    z-index: 10000;
+    box-shadow:
+        0 0 10px rgba(255, 68, 68, 0.3),
+        inset 0 0 8px rgba(255, 68, 68, 0.1);
+    animation: closeButtonPulse 2s ease-in-out infinite;
     text-shadow: none;
 }
 
 .close:hover {
+    color: #fff;
+    background: rgba(255, 68, 68, 0.3);
+    border-color: #ff6666;
+    transform: scale(1.1) rotate(90deg);
+    box-shadow:
+        0 0 20px rgba(255, 68, 68, 0.6),
+        inset 0 0 12px rgba(255, 68, 68, 0.2);
+}
+
+.close:active {
+    transform: scale(0.95) rotate(90deg);
+}
+
+@keyframes closeButtonPulse {
+    0%, 100% {
+        box-shadow:
+            0 0 10px rgba(255, 68, 68, 0.3),
+            inset 0 0 8px rgba(255, 68, 68, 0.1);
+    }
+    50% {
+        box-shadow:
+            0 0 20px rgba(255, 68, 68, 0.6),
+            inset 0 0 12px rgba(255, 68, 68, 0.2);
+    }
+}
+
+/* Отключаем анимацию для пользователей с prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    .close {
+        animation: none;
+    }
+}
+
+/* Навигационные кнопки между статьями */
+.modal-navigation {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(0, 255, 153, 0.2);
+}
+
+.nav-article-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
     color: var(--color-primary);
-    background: rgba(0, 255, 153, 0.1);
+    background: rgba(0, 255, 153, 0.05);
+    border: 2px solid var(--color-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow:
+        0 0 10px rgba(0, 255, 153, 0.2),
+        inset 0 0 8px rgba(0, 255, 153, 0.05);
+}
+
+.nav-article-btn:hover:not(:disabled) {
+    background: rgba(0, 255, 153, 0.15);
     border-color: var(--color-primary);
-    transform: rotate(90deg);
+    transform: translateY(-2px);
+    box-shadow:
+        0 0 20px rgba(0, 255, 153, 0.4),
+        inset 0 0 12px rgba(0, 255, 153, 0.1);
+}
+
+.nav-article-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.nav-article-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: rgba(0, 255, 153, 0.2);
+}
+
+.nav-article-btn .nav-icon {
+    font-size: 16px;
+    transition: transform 0.3s ease;
+}
+
+.nav-article-btn.prev-article:hover:not(:disabled) .nav-icon {
+    transform: translateX(-4px);
+}
+
+.nav-article-btn.next-article:hover:not(:disabled) .nav-icon {
+    transform: translateX(4px);
+}
+
+.nav-text {
+    letter-spacing: 1px;
+}
+
+@media (max-width: 480px) {
+    .modal-navigation {
+        flex-direction: column;
+    }
+
+    .nav-article-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Прогресс-бар загрузки статьи */
+.article-loading-bar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: rgba(0, 255, 153, 0.1);
+    overflow: hidden;
+    display: none;
+}
+
+.article-loading-bar.active {
+    display: block;
+}
+
+.loading-progress {
+    height: 100%;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--color-primary) 0px,
+        var(--color-primary) 10px,
+        transparent 10px,
+        transparent 20px
+    );
+    animation: terminalLoading 0.8s linear infinite;
+    width: 50%;
+}
+
+@keyframes terminalLoading {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(40px); }
 }
 
 input[type=range] {
@@ -886,8 +1066,8 @@ input[type=range] {
 
 #readerModeBtn {
     position: absolute;
-    top: 10px;
-    right: 50px;
+    top: 20px;
+    right: 74px;
     padding: 6px 12px;
     background: rgba(0, 255, 153, 0.15);
     border: 1px solid #00ff99;
@@ -908,7 +1088,7 @@ input[type=range] {
 /* === Кнопка экспорта в PDF === */
 #exportPdfBtn {
     position: absolute;
-    top: 10px;
+    top: 20px;
     right: 195px;
     padding: 6px 12px;
     background: rgba(255, 176, 0, 0.15);
