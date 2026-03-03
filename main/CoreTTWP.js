@@ -26,19 +26,28 @@ function renderMarkdown(text) {
 
 document.addEventListener("DOMContentLoaded", async () => {
     const postsListFile = "posts/list.txt";
-    const postsPerPage = 1;
+    const postsPerPage = 9;
     let currentPage = 1;
     let allPosts = [];
     let filteredPosts = [];
     let fuseInstance;
 
     const blogContainer = document.getElementById("blog");
-    const tocContainer = document.getElementById("toc");
     const prevButton = document.getElementById("prevPage");
     const nextButton = document.getElementById("nextPage");
     const pageNumber = document.getElementById("pageNumber");
     const searchInput = document.getElementById("searchInput");
     const loadingIndicator = document.getElementById("loadingIndicator");
+
+    // Экранирование HTML для предотвращения XSS
+    function escapeHtml(text) {
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
 
     // Транслитерация для формирования URL
     function transliterate(text) {
@@ -55,9 +64,18 @@ document.addEventListener("DOMContentLoaded", async () => {
             .trim("-");
     }
 
-    // Показать индикатор загрузки
+    // Показать индикатор загрузки со скелетонами
     function showLoading() {
         loadingIndicator.style.display = "block";
+        blogContainer.innerHTML = Array(postsPerPage).fill(0).map(() => `
+            <div class="post-card skeleton-card" aria-hidden="true">
+                <div class="skeleton-line" style="width:60%;height:20px;"></div>
+                <div class="skeleton-line" style="width:30%;height:13px;margin-bottom:16px;"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line" style="width:70%;"></div>
+            </div>
+        `).join('');
     }
 
     // Скрыть индикатор загрузки
@@ -73,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!response.ok) throw new Error("Ошибка загрузки списка статей");
 
             const text = await response.text();
-            const postFiles = text.split("\n").map(line => line.trim()).filter(line => line !== "");
+            const postFiles = text.split("\n").map(line => line.trim()).filter(line => line !== "" && !line.startsWith("-"));
 
             await loadAllPosts(postFiles);
         } catch (error) {
@@ -122,59 +140,19 @@ document.addEventListener("DOMContentLoaded", async () => {
             });
         }
 
-        generateTOC();
         checkURLForArticle();
         displayPosts();
     }
 
-    // Эффект печати символ за символом (typing effect)
-    function typeWriter(element, text, speed, callback) {
-        let i = 0;
-        element.textContent = '';
-        // Добавляем класс мигающего курсора во время печати
-        element.classList.add('typing-active');
-        function type() {
-            if (i < text.length) {
-                element.textContent += text.charAt(i);
-                i++;
-                setTimeout(type, speed);
-            } else {
-                // Убираем курсор после завершения печати
-                element.classList.remove('typing-active');
-                if (callback) callback();
-            }
-        }
-        type();
-    }
-
-    // Генерация оглавления с эффектом печати
-    function generateTOC() {
-        tocContainer.innerHTML = "";
-        const ul = document.createElement("ul");
-
-        // Создаём элементы списка и собираем их для последовательного эффекта печати
-        const items = filteredPosts.map((post, index) => {
-            const li = document.createElement("li");
-            const a = document.createElement("a");
-            a.href = "#";
-            // Клик по ссылке показывает только заголовок в основной области
-            a.addEventListener("click", (e) => {
-                e.preventDefault();
-                displayPostTitles(index);
-            });
-            li.appendChild(a);
-            ul.appendChild(li);
-            return { element: a, text: post.title };
-        });
-
-        tocContainer.appendChild(ul);
-
-        // Запускаем эффект печати последовательно для каждого элемента (30-50 мс на символ)
-        function typeNext(i) {
-            if (i >= items.length) return;
-            typeWriter(items[i].element, items[i].text, 40, () => typeNext(i + 1));
-        }
-        typeNext(0);
+    // Извлекает первое изображение из текста поста
+    function extractFirstImage(content) {
+        // Markdown: ![alt](url)
+        const mdImg = content.match(/!\[.*?\]\((https?:\/\/[^\s)]+)\)/);
+        if (mdImg) return mdImg[1];
+        // Прямой URL изображения
+        const directImg = content.match(/(https?:\/\/[^\s]+?\.(jpg|jpeg|png|gif|webp)(\?[^\s]*)?)/i);
+        if (directImg) return directImg[1];
+        return null;
     }
 
     function generateMetaTags(post) {
@@ -246,27 +224,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 }
 
-    // Показывает только заголовок статьи в основной области (первый уровень навигации)
-    function displayPostTitles(postIndex) {
-        blogContainer.innerHTML = "";
-        const post = filteredPosts[postIndex];
-        if (!post) return;
-
-        const article = document.createElement("div");
-        article.classList.add("post");
-
-        const titleEl = document.createElement("h2");
-        titleEl.classList.add("post-title-link");
-        titleEl.textContent = post.title;
-        // Клик по заголовку открывает полную статью в модальном окне
-        titleEl.addEventListener("click", () => openArticleModal(postIndex));
-
-        article.appendChild(titleEl);
-        blogContainer.appendChild(article);
-        scrollToTop();
-    }
-
-    // Открывает модальное окно с полной статьёй (второй уровень навигации)
+    // Открывает модальное окно с полной статьёй
     function openArticleModal(postIndex) {
         const post = filteredPosts[postIndex];
         if (!post) return;
@@ -282,15 +240,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             : post.content;
 
         articleContent.innerHTML = `
-            <h2>${post.title}</h2>
-            <p><small>${post.date}</small></p>
+            <nav class="breadcrumbs" aria-label="Навигация">
+                <a href="#" class="breadcrumb-home">Главная</a>
+                <span class="breadcrumb-sep"> / </span>
+                <span class="breadcrumb-current">${escapeHtml(post.title)}</span>
+            </nav>
+            <h2>${escapeHtml(post.title)}</h2>
+            <p><small>${escapeHtml(post.date)}</small></p>
             <div class="article-body">${processedContent}</div>
             <p>
-                <button class="copy-link" data-link="${articleURL}">🔗 Скопировать ссылку</button>
-                <button class="share-link" data-title="${post.title}" data-content="${shortContent}" data-url="${articleURL}">📤 Поделиться!</button>
+                <button class="copy-link" data-link="${escapeHtml(articleURL)}">🔗 Скопировать ссылку</button>
+                <button class="share-link" data-title="${escapeHtml(post.title)}" data-content="${escapeHtml(shortContent)}" data-url="${escapeHtml(articleURL)}">📤 Поделиться!</button>
             </p>
             <div id="utterances-container"></div>
         `;
+
+        // Хлебная крошка "Главная" закрывает модальное окно
+        const breadcrumbHome = articleContent.querySelector('.breadcrumb-home');
+        if (breadcrumbHome) {
+            breadcrumbHome.addEventListener('click', (e) => {
+                e.preventDefault();
+                modal.style.display = 'none';
+            });
+        }
 
         // Добавляем виджет комментариев Utterances
         const utterancesScript = document.createElement('script');
@@ -301,6 +273,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         utterancesScript.setAttribute('crossorigin', 'anonymous');
         utterancesScript.async = true;
         document.getElementById('utterances-container').appendChild(utterancesScript);
+
+        // Сбросить прогресс-бар чтения и прокрутку модального окна
+        const modalContentEl = modal.querySelector('.modal-content');
+        const progressBar = document.getElementById('modalReadingProgress');
+        if (progressBar) progressBar.style.width = '0%';
+        if (modalContentEl) modalContentEl.scrollTop = 0;
 
         modal.style.display = "block";
         generateMetaTags(post);
@@ -327,18 +305,29 @@ document.addEventListener("DOMContentLoaded", async () => {
             const wordCount = post.content.split(/\s+/).filter(w => w.length > 0).length;
             const readTime = Math.max(1, Math.ceil(wordCount / 200));
 
-            // Получить превью (первые 150 символов текста)
-            const previewText = post.content.replace(/[#*`\[\]]/g, '').substring(0, 150).trim() + '...';
+            // Получить превью (первые 200 символов текста без Markdown-разметки)
+            const previewText = post.content.replace(/[#*`\[\]!>]/g, '').substring(0, 200).trim() + '...';
+
+            // Извлечь первое изображение из поста
+            const imageUrl = extractFirstImage(post.content);
+            const safeTitle = escapeHtml(post.title);
+            const safeDate = escapeHtml(post.date);
+            const imageHtml = imageUrl
+                ? `<div class="post-card-image-wrap"><img class="post-card-image" src="${escapeHtml(imageUrl)}" alt="${safeTitle}" loading="lazy"></div>`
+                : '';
 
             postCard.innerHTML = `
-                <div class="post-card-header">
-                    <h2 class="post-card-title">${post.title}</h2>
-                    <span class="post-card-date">${post.date}</span>
-                </div>
-                <p class="post-card-preview">${previewText}</p>
-                <div class="post-card-meta">
-                    <span class="post-card-meta-item">Время чтения: ${readTime} мин</span>
-                    <span class="post-card-meta-item">Символов: ${post.content.length}</span>
+                ${imageHtml}
+                <div class="post-card-body">
+                    <div class="post-card-header">
+                        <h2 class="post-card-title">${safeTitle}</h2>
+                        <span class="post-card-date">${safeDate}</span>
+                    </div>
+                    <p class="post-card-preview">${previewText}</p>
+                    <div class="post-card-meta">
+                        <span class="post-card-meta-item">⏱ ${readTime} мин</span>
+                    </div>
+                    <span class="post-card-read-more">Читать далее →</span>
                 </div>
             `;
 
@@ -349,6 +338,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         pageNumber.textContent = `Страница ${currentPage}`;
         prevButton.disabled = currentPage === 1;
         nextButton.disabled = currentPage >= totalPages;
+
+        // Обновить счётчик результатов поиска
+        const resultsCountEl = document.getElementById('searchResultsCount');
+        if (resultsCountEl) {
+            const query = searchInput ? searchInput.value.trim() : '';
+            resultsCountEl.textContent = query
+                ? `Найдено: ${filteredPosts.length} из ${allPosts.length} статей`
+                : `Всего: ${allPosts.length} статей`;
+        }
 
         scrollToTop();
     }
@@ -405,7 +403,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (!query) {
             filteredPosts = allPosts;
             currentPage = 1;
-            generateTOC();
             displayPosts();
             return;
         }
@@ -427,17 +424,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log(`Поиск завершен за ${(endTime - startTime).toFixed(2)}мс`);
 
         currentPage = 1;
-        generateTOC();
         displayPosts();
-
-        // Показать количество результатов
-        const resultsInfo = document.createElement('p');
-        resultsInfo.textContent = `Найдено: ${filteredPosts.length} (${(endTime - startTime).toFixed(2)}мс)`;
-        resultsInfo.style.color = '#00ff99';
-        resultsInfo.style.fontSize = '12px';
-        resultsInfo.style.margin = '4px 0 0 0';
-        document.querySelector('.search-container').appendChild(resultsInfo);
-        setTimeout(() => resultsInfo.remove(), 3000);
     }
 
     // Проверка URL для прямой ссылки — автоматически открывает модальное окно
@@ -460,6 +447,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("closeArticleModal").addEventListener("click", () => {
         articleModal.style.display = "none";
     });
+
+    // Прогресс-бар чтения внутри модального окна
+    const modalContentEl = document.querySelector('#articleModal .modal-content');
+    const modalProgressBar = document.getElementById('modalReadingProgress');
+    if (modalContentEl && modalProgressBar) {
+        modalContentEl.addEventListener('scroll', () => {
+            const scrollHeight = modalContentEl.scrollHeight - modalContentEl.clientHeight;
+            const scrolled = scrollHeight > 0 ? (modalContentEl.scrollTop / scrollHeight) * 100 : 0;
+            modalProgressBar.style.width = scrolled + '%';
+        });
+    }
 
     // Закрытие по клику вне области модального окна
     window.addEventListener("click", (event) => {

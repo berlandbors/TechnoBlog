@@ -79,19 +79,6 @@
     </div>
 </header>
 
-    <h1 style="color: #00ff99; text-shadow: 0 0 10px rgba(0, 255, 153, 0.5);">Tchno Blog - о моих веб разработках.<span class="cursor">█</span></h1>
-<!--img src="https://berlandbors.github.io/TechnoBlog/icons/favicon.svg" alt="Читайте в ТехноБлоге..." style="width:250px; height:auto;"-->
-<h3 style="color: #33ff88;">[*]</h3>
-<h3 style="color: #66ffaa"><em>Проект Берлина Андрея.</em></h3>
-<h4>веб разработки - инструменты для жизни.</h4>
-
-
-    <!-- Оглавление (прокручиваемый блок) -->
-    <div id="toc-container">
-        <h2>Содержание</h2>
-        <div id="toc"></div>
-    </div><hr>
-
 
     
 <div id="loadingIndicator" style="display: none; text-align: center; margin: 20px;">
@@ -125,12 +112,12 @@
 
 
     <!-- Поле поиска -->
-    <!-- Красивое поле поиска -->
 <div class="search-container">
     <input type="text" id="searchInput" placeholder="Поиск по статьям... (/ для фокуса)" oninput="searchPosts()">
     <button class="search-clear" id="searchClear" title="Очистить">✕</button>
 </div>
-    <div id="blog"></div>
+<div id="searchResultsCount" class="search-results-count"></div>
+    <div id="blog" class="articles-grid"></div>
 
     <!-- Кнопки для переключения страниц -->
     <div class="pagination">
@@ -139,21 +126,12 @@
         <button id="nextPage">[ ВПЕРЁД → ]</button>
     </div>
 
-<hr><pstyle="color: #FF0000">Все свои отзывы и пожелания присылайте сюда:</p>
-<ul>
-    <li><a href="https://t.me/Berlandbor" target="_blank">Telegram: @Berlandbor</a></li>
-    <li>Email: <a href="mailto:andrew.berlin96@gmail.com">andrew.berlin96@gmail.com</a></li>
-</ul><hr>
 
-<p style="color: #66ffaa"><em>Этот Блог написан на языках Веб Кодинга: HTML, CSS, JS - Берлиным Андреем. Весь код этого блога и его содержимое принадлежит Берлину Андрею.</em></p>
-<p>© Берлин Андрей</p>
-
-   
-    
 
 <!-- Модальное окно статьи -->
 <div id="articleModal" class="modal">
     <div class="modal-content">
+        <div class="modal-reading-progress" id="modalReadingProgress"></div>
         <span class="close" id="closeArticleModal">&times;</span>
         <div id="articleContent"></div>
     </div>
@@ -210,13 +188,11 @@
             localStorage.setItem('readerMode', isReaderMode);
 
             if (isReaderMode) {
-                document.getElementById('toc-container').style.display = 'none';
                 document.querySelector('.pagination').style.display = 'none';
                 document.querySelector('.search-container').style.display = 'none';
                 document.getElementById('articleContent').style.fontSize = '18px';
                 document.getElementById('articleContent').style.lineHeight = '1.8';
             } else {
-                document.getElementById('toc-container').style.display = 'block';
                 document.querySelector('.pagination').style.display = 'flex';
                 document.querySelector('.search-container').style.display = 'block';
                 document.getElementById('articleContent').style.fontSize = '';
